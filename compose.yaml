@@ -1,0 +1,58 @@
+networks:
+  etl_bridge:
+    driver: bridge
+
+services:
+  zookeeper:
+    extends:
+      file: containers/kafka.yaml
+      service: zookeeper
+    networks:
+      - etl_bridge
+    profiles: [infrastracture]
+
+  kafka:
+    extends:
+      file: containers/kafka.yaml
+      service: kafka
+    networks:
+      - etl_bridge
+    profiles: [infrastracture]
+
+  prometheus:
+    extends:
+      file: containers/prom_grafana.yaml
+      service: prometheus
+    networks:
+      - etl_bridge
+    profiles: [monitoring]
+
+  grafana:
+    extends:
+      file: containers/prom_grafana.yaml
+      service: grafana
+    networks:
+      - etl_bridge
+    profiles: [monitoring]
+
+  scraper:
+    image: scraper
+    build:
+      context: .
+      dockerfile: ./scraper/src/Dockerfile
+    hostname: scraper
+    container_name: scraper
+    restart: always
+    ports:
+      - "${SCRAPER_PORT}:${SCRAPER_PORT}"
+    environment:
+      - SCRAPER_PORT=$SCRAPER_PORT
+    env_file:
+      - .env
+    networks:
+      - etl_bridge
+    tty: true
+    profiles: [microservice]
+
+volumes:
+  prom_data:

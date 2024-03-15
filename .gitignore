@@ -1,0 +1,6 @@
+containers/data
+containers/grafana
+data_formats
+**/**.pyc
+**/**.DS_Store
+**/**.python-version
