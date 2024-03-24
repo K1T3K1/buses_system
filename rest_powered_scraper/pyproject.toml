@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+dependencies = [
+  "aiohttp==3.9.1",
+  "pandas==2.1.4",
+  "pyarrow==14.0.2",
+]
+requires-python = ">=3.11"
+name = "scraper"
+version = "0.0.1"
+description = "FastAPI powered scrapers"
+authors = [{ name = "Kajetan Zarzycki", email = "82800@student.pb.edu.pl" }]
+maintainers = [
+  { name = "Kajetan Zarzycki", email = "82800@student.pb.edu.pl" },
+]
+
+[project.optional-dependencies]
+dev = ["black==23.3.0", "invoke==2.1.2", "mypy==1.3.0", "ruff==0.0.267"]
+
+[project.urls]
+repository = "https://github.com/K1T3K1/bkm_scraper"
+
+[project.scripts]
+rest_powered_scraper = "rest_powered_scraper.__main__:main"
+
+
+[tool.pytest.ini_options]
+pythonpath = [".", "src"]
+asyncio_mode = "auto"
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.isort]
+extra-standard-library = ["typing_extensions"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_untyped_calls = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+strict = false
+pretty = true
+strict_equality = true
+strict_optional = true
+show_error_codes = true
+show_error_context = true
+
+[[tool.mypy.overrides]]
+module = "crc"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "bitarray"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "influxdb_client"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "finnhub"
+ignore_missing_imports = true

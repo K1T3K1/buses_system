@@ -7,7 +7,7 @@ from ..scraper import Scraper
 from ..models.running_vehicles import RunningVehicles
 import logging
 from prometheus_client import CollectorRegistry, Counter, Enum
-from libraries.base_service import MonitoredService
+from libraries.monitored_service import MonitoredService
 import asyncio
 from ..models.scraper_metric import ScraperMetric
 from functools import partial
@@ -34,6 +34,10 @@ async def kafka_context(app: Application, registry: CollectorRegistry):
     for topic in topics:
         app[topic] = Topic(topic, kafka)
 
+    # ADD SCRAPERS HERE
+    
+    
+    
     scraper = Scraper(
         "https://przystanki.bialystok.pl",
         30,
@@ -43,6 +47,11 @@ async def kafka_context(app: Application, registry: CollectorRegistry):
         metric,
         app["running_vehicles_json"],
     )
+    
+
+
+    # ADD SCRAPERS HERE
+
     logger.critical("Startup finished")
 
     yield

@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "Vehicle",
+  "namespace": "your.namespace",
+  "fields": [
+    { "name": "line_name", "type": "string" },
+    { "name": "course_loid", "type": "long" },
+    { "name": "day_course_loid", "type": "long" },
+    { "name": "vehicle_id", "type": "long" },
+    { "name": "delay_sec", "type": ["null", "long"], "default": null },
+    { "name": "longitude", "type": "double" },
+    { "name": "latitude", "type": "double" },
+    { "name": "angle", "type": "long" },
+    { "name": "reached_meters", "type": "long" },
+    { "name": "variant_loid", "type": "long" },
+    { "name": "last_ping_date", "type": "long" },
+    { "name": "distance_to_nearest_stop_point", "type": "long" },
+    { "name": "nearest_symbol", "type": "string" },
+    { "name": "operator", "type": "string" },
+    { "name": "on_stop_point", "type": ["null", "string"], "default": null },
+    { "name": "order_in_course", "type": "long" },
+    { "name": "optional_direction", "type": "string" }
+  ]
+}

@@ -1,13 +1,18 @@
-from pydantic import BaseModel, ConfigDict, Field, AliasGenerator
+from pydantic import ConfigDict, Field, AliasGenerator
 from pydantic.alias_generators import to_camel
-from typing import Optional, ClassVar
-from .parquet_model import ParquetModel
-import pyarrow as pa
+from typing import Optional, Iterator
+from .avro_model import AvroModel
+from avro.io import BinaryEncoder, DatumWriter
+import avro.schema
+import io
 
-class Vehicle(BaseModel):
+_schema = avro.schema.parse(open("/avro/vehicle.avsc").read())
+
+class Vehicle(AvroModel):
     model_config = ConfigDict(
         alias_generator=AliasGenerator(validation_alias=to_camel, serialization_alias=to_camel),
-        arbitrary_types_allowed=True
+        arbitrary_types_allowed=True,
+        populate_by_name=True,
     )
     line_name: str
     course_loid: int
@@ -27,32 +32,19 @@ class Vehicle(BaseModel):
     order_in_course: int
     optional_direction: str
 
-    parquet_schema: ClassVar[pa.Schema] = pa.schema([
-        pa.field("line_name", pa.string()),
-        pa.field("course_loid", pa.int64()),
-        pa.field("day_course_loid", pa.int64()),
-        pa.field("vehicle_id", pa.int64()),
-        pa.field("delay_sec", pa.int64()),
-        pa.field("longitude", pa.float64()),
-        pa.field("latitude", pa.float64()),
-        pa.field("angle", pa.int64()),
-        pa.field("reached_meters", pa.int64()),
-        pa.field("variant_loid", pa.int64()),
-        pa.field("last_ping_date", pa.int64()),
-        pa.field("distance_to_nearest_stop_point", pa.int64()),
-        pa.field("nearest_symbol", pa.string()),
-        pa.field("operator", pa.string()),
-        pa.field("on_stop_point", pa.string()),
-        pa.field("order_in_course", pa.int64()),
-        pa.field("optional_direction", pa.string())
+    def to_avro(self) -> bytes:
+        buffer = io.BytesIO()
+        encoder = BinaryEncoder(buffer)
+        datum_writer = DatumWriter(_schema)
+        datum_writer.write(self.model_dump(), encoder)
+        return buffer.getvalue()
     
-    ])
-
-class RunningVehicles(ParquetModel):
+class RunningVehicles(AvroModel):
     vehicles: list[Vehicle]
     offline: bool = Field(exclude=True)
 
-    def to_parquet(self) -> pa.Table:
-        vehicles_dict_list = [vehicle.model_dump() for vehicle in self.vehicles]
-        table = pa.Table.from_pylist(vehicles_dict_list, schema=Vehicle.parquet_schema)
-        return table
+    def to_avro(self) -> Iterator[bytes]:
+        for vehicle in self.vehicles:
+            yield vehicle.to_avro()
+    
+

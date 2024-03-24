@@ -10,6 +10,7 @@ from aiohttp.web import Application
 
 logger = logging.getLogger(__name__)
 
+
 class MonitoredService:
     app: Application
     registry: CollectorRegistry
@@ -18,7 +19,8 @@ class MonitoredService:
         self.app = Application()
         prometheus_monitor = PrometheusMonitor()
         prometheus_monitor.register(self)
-        
+
+
 class PrometheusMonitor:
     _latest_pull: float
     _warning_time: float = 180
@@ -58,7 +60,7 @@ class PrometheusMonitor:
         self._latest_pull = datetime.now(timezone.utc).timestamp()
         return Response(text=latest_metrics.decode())
 
-    def register(self, base_service: BaseService) -> None:
+    def register(self, base_service: MonitoredService) -> None:
         metrics_endpoint = "/metrics"
         base_service.app.add_routes([web.get(metrics_endpoint, self.handle_metrics)])
         base_service.registry = CollectorRegistry()

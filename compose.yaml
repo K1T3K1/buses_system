@@ -53,6 +53,8 @@ services:
       - etl_bridge
     tty: true
     profiles: [microservice]
+    volumes:
+      - ./avro:/avro
 
 volumes:
   prom_data:
