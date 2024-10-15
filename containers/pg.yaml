@@ -1,0 +1,16 @@
+networks:
+  etl-bridge:
+    driver: bridge
+  
+services:
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: buses
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data 

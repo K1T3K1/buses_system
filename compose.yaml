@@ -19,6 +19,14 @@ services:
       - etl_bridge
     profiles: [infrastracture]
 
+  postgres:
+    extends:
+      file: containers/pg.yaml
+      service: postgres
+    networks:
+      - etl_bridge
+    profiles: [infrastracture]
+
   prometheus:
     extends:
       file: containers/prom_grafana.yaml
