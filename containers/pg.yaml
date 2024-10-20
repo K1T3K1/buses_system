@@ -4,7 +4,7 @@ networks:
   
 services:
   postgres:
-    image: postgres
+    image: timescale/timescaledb:latest-pg16
     restart: always
     ports:
       - 5432:5432
@@ -12,5 +12,6 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: buses
+      TS_TUNE_NUM_CPUS: 4
     volumes:
       - ./pgdata:/var/lib/postgresql/data 
