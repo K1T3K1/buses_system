@@ -10,6 +10,7 @@ services:
     networks:
       - etl_bridge
     profiles: [infrastracture]
+    user: root
 
   kafka:
     extends:
@@ -18,6 +19,7 @@ services:
     networks:
       - etl_bridge
     profiles: [infrastracture]
+    user: root
 
   postgres:
     extends:
@@ -26,6 +28,7 @@ services:
     networks:
       - etl_bridge
     profiles: [infrastracture]
+    user: root
 
   prometheus:
     extends:
@@ -34,6 +37,7 @@ services:
     networks:
       - etl_bridge
     profiles: [monitoring]
+    user: root
 
   grafana:
     extends:
@@ -42,6 +46,7 @@ services:
     networks:
       - etl_bridge
     profiles: [monitoring]
+    user: root
 
   scraper:
     image: scraper
@@ -55,6 +60,27 @@ services:
       - "${SCRAPER_PORT}:${SCRAPER_PORT}"
     environment:
       - SCRAPER_PORT=$SCRAPER_PORT
+    env_file:
+      - .env
+    networks:
+      - etl_bridge
+    tty: true
+    profiles: [microservice]
+    volumes:
+      - ./avro:/avro
+
+  shovel:
+    image: shovel
+    build:
+      context: .
+      dockerfile: ./shovel/src/Dockerfile
+    hostname: shovel
+    container_name: shovel
+    restart: always
+    ports:
+      - "${SHOVEL_PORT}:${SHOVEL_PORT}"
+    environment:
+      - SHOVEL_PORT=$SHOVEL_PORT
     env_file:
       - .env
     networks:

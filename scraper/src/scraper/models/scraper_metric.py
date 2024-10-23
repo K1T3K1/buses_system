@@ -1,4 +1,4 @@
-from prometheus_client import CollectorRegistry, Counter, Enum
+from prometheus_client import CollectorRegistry, Counter, Enum, Gauge
 
 class ScraperMetric:
     def __init__(self, registry: CollectorRegistry):
@@ -43,4 +43,14 @@ class ScraperMetric:
             '',
             self.registry,
             states=["connected", "disconnected"]
+        )
+
+        self.scraped_records = Gauge(
+            "scraper_scraped_records",
+            "Number of records scraped",
+            ["scraped_type"],
+            'etl',
+            'scraper',
+            'records',
+            self.registry
         )

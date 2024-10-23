@@ -60,6 +60,10 @@ class Scraper:
             response_text = await resp.text()
             model = self._type.model_validate_json(response_text)
 
+
+
+            self._metric.scraped_records.labels(repr(self._type)).set(model.record_count)
+
             avro = model.to_avro()
 
             if isinstance(avro, bytes):

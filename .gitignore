@@ -4,3 +4,7 @@ data_formats
 **/**.pyc
 **/**.DS_Store
 **/**.python-version
+*.parquet
+*.avro
+*.drawio
+*.drawio.png
