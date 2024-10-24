@@ -30,7 +30,11 @@ async def kafka_context(app: Application, registry: CollectorRegistry):
         bootstrap_servers=kafka_server,
         enable_auto_commit=True,
         group_id="vehicles_uploader",
-        auto_offset_reset="earliest"
+        auto_offset_reset="earliest",
+        auto_commit_interval_ms=10000,
+        heartbeat_interval_ms=20000,
+        request_timeout_ms=60000,
+        session_timeout_ms=60000,
     )
     await kafka.start()
     kafka_connection_task = asyncio.create_task(kafka_connection(kafka, metric))

@@ -1,4 +1,4 @@
-FROM python:3.11.3 as base
+FROM python:3.12.7 as base
 
 FROM base AS builder
 
