@@ -3,7 +3,7 @@ import logging
 from rich.logging import RichHandler
 from rich.console import Console
 from .kafka import receiver_config
-
+import os
 
 handler = RichHandler(console=Console(soft_wrap=True))
 logging.basicConfig(
@@ -16,8 +16,8 @@ def main():
     logger.critical("ENTERING MAIN")
     base = receiver_config.BaseShovel()
     app = base.app
+    port = os.getenv("SHOVEL_PORT", 2137)
 
     logger.critical("about to run app")
-    run_app(app, port=2137)
+    run_app(app, port=int(port))
 
-main()

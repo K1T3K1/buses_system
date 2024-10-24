@@ -8,6 +8,7 @@ import logging
 from libraries.pg_models.positions import Position
 from asyncio import Semaphore
 from ..models.shovel_metric import ShovelMetric
+from functools import partial
 
 logger = logging.getLogger(__name__)
 
@@ -39,22 +40,27 @@ async def running_vehicles_generator(row, metric: ShovelMetric):
 
     await upload_row(row, metric)
 
+def callback(task, semaphore: Semaphore):
+    tasks.discard(task)
+    semaphore.release()
+
 async def message_loop(kafka: AIOKafkaConsumer, metric: ShovelMetric) -> None:
     sem = Semaphore(4)
     loop = asyncio.get_running_loop()
     logger.critical("Starting message loop")
-    async for msg in kafka:
+    while True:
+        await sem.acquire()
+        msg = await kafka.getone()
         metric.kafka_consumes.labels("running_vehicles").inc()
         t = loop.create_task(handle_message(msg, sem, metric))
         tasks.add(t)
-        t.add_done_callback(tasks.discard)
+        t.add_done_callback(lambda task: callback(task, sem))
 
 
 async def handle_message(msg: ConsumerRecord, sem: Semaphore, metric: ShovelMetric):
-    async with sem:
-        reader = DatumReader(writers_schema=_running_vehicles_schema)
-        buffer = io.BytesIO(msg.value)
-        decoder = BinaryDecoder(buffer)
-        row = reader.read(decoder)
-        await running_vehicles_generator(row, metric)
+    reader = DatumReader(writers_schema=_running_vehicles_schema)
+    buffer = io.BytesIO(msg.value)
+    decoder = BinaryDecoder(buffer)
+    row = reader.read(decoder)
+    await running_vehicles_generator(row, metric)
 

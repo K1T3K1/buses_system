@@ -43,8 +43,6 @@ async def kafka_context(app: Application, registry: CollectorRegistry):
     task = asyncio.create_task(message_loop(kafka, metric))
 
     logger.critical("Startup finished")
-    await task
-
     yield
     task.cancel()
 
